@@ -13,16 +13,16 @@ arch=('x86_64')
 url="https://wiki.linuxfoundation.org/realtime/start"
 license=('GPL2')
 makedepends=('bc' 'git' 'graphviz' 'imagemagick' 'kmod' 'libelf' 'pahole'
-'python-sphinx' 'python-sphinx_rtd_theme' 'xmlto' 'modprobed-db')
+'python-sphinx' 'python-sphinx_rtd_theme' 'xmlto' 'modprobed-db' 'wget')
 options=('!strip')
 source=(
-  "git+https://gitlab.archlinux.org/dvzrv/linux-rt-lts.git/#tag=v${pkgver}?signed"
+  "https://gitlab.archlinux.org/dvzrv/linux-rt-lts/-/archive/v5.10.27.36.arch1/linux-rt-lts-v5.10.27.36.arch1.tar.gz"
   'config'
 )
 sha512sums=('SKIP'
-            '5bc052617e1234101aee9f3b6d2401290e80ca616f1d7d68072121737c16be500fe29abf17e6bf7fd666829e9c41833af2e79fd6e8aba9f9e24b47bc5c7d1d19')
+            'SKIP')
 b2sums=('SKIP'
-        '4fcc11a9b47c2275c762468f0c706685eb603bf6eda30a682d6f8780224fc2108112eee9cbc43600c7df47c9b1de5bf033bfdb044116840c8dbb41a3a53d787d')
+        'SKIP')
 validpgpkeys=(
   '647F28654894E3BD457199BE38DBBDC86092693E'  # Greg Kroah-Hartman <gregkh@linuxfoundation.org>
   '5ED9A48FC54C0A22D1D0804CEBC26CDB5A56DE73'  # Steven Rostedt (Der Hacker) <rostedt@goodmis.org>
