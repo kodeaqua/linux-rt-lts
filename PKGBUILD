@@ -33,8 +33,10 @@ export KBUILD_BUILD_HOST=archlinux
 export KBUILD_BUILD_USER=$pkgbase
 export KBUILD_BUILD_TIMESTAMP="$(date -Ru${SOURCE_DATE_EPOCH:+d @$SOURCE_DATE_EPOCH})"
 
+srcdir=""${pkgbase}"-v"${pkgver}""
+
 prepare() {
-  cd ""${pkgbase}"-v"${pkgver}""
+  cd $srcdir
 
   echo "Setting version..."
   scripts/setlocalversion --save-scmversion
@@ -64,12 +66,12 @@ prepare() {
     if ! [[ -f $HOME/.config/modprobed.db ]]; then
       modprobed-db && modprobed-db storesilent
     fi
-    make $HOME/.config/modprobed.db localmodconfig
+    make LSMOD=$HOME/.config/modprobed.db localmodconfig
   fi
 }
 
 build() {
-  cd "${pkgbase}"
+  cd $srcdir
   make all
   make htmldocs
 }
@@ -81,7 +83,7 @@ _package() {
               'linux-firmware: firmware images needed for some devices')
   provides=(VIRTUALBOX-GUEST-MODULES WIREGUARD-MODULE)
 
-  cd "${pkgbase}"
+  cd $srcdir
   local kernver="$(<version)"
   local modulesdir="$pkgdir/usr/lib/modules/$kernver"
 
@@ -103,7 +105,7 @@ _package() {
 _package-headers() {
   pkgdesc="Headers and scripts for building modules for the $pkgdesc kernel"
 
-  cd "${pkgbase}"
+  cd $srcdir
   local builddir="$pkgdir/usr/lib/modules/$(<version)/build"
 
   echo "Installing build files..."
@@ -181,7 +183,7 @@ _package-headers() {
 _package-docs() {
   pkgdesc="Documentation for the $pkgdesc kernel"
 
-  cd "${pkgbase}"
+  cd $srcdir
   local builddir="$pkgdir/usr/lib/modules/$(<version)/build"
 
   echo "Installing documentation..."
