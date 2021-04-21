@@ -1,6 +1,10 @@
 # Maintainer: David Runge <dvzrv@archlinux.org>
 # Contributor:  Joakim Hernberg <jbh@alchemy.lu>
 
+# Tweaks from here!
+# Compile only used modules [y/n]
+_localmodcfg=y
+
 pkgbase=linux-rt-lts
 pkgver=5.10.27.36.arch1
 pkgrel=1
@@ -9,7 +13,7 @@ arch=('x86_64')
 url="https://wiki.linuxfoundation.org/realtime/start"
 license=('GPL2')
 makedepends=('bc' 'git' 'graphviz' 'imagemagick' 'kmod' 'libelf' 'pahole'
-'python-sphinx' 'python-sphinx_rtd_theme' 'xmlto')
+'python-sphinx' 'python-sphinx_rtd_theme' 'xmlto' 'modprobed-db')
 options=('!strip')
 source=(
   "git+https://gitlab.archlinux.org/dvzrv/linux-rt-lts.git/#tag=v${pkgver}?signed"
@@ -55,6 +59,13 @@ prepare() {
 
   make -s kernelrelease > version
   echo "Prepared $pkgbase version $(<version)"
+
+  if [[ "$_localmodcfg" == 'y' ]]; then
+    if ! [[ -f $HOME/.config/modprobed.db ]]; then
+      modprobed-db && modprobed-db storesilent
+    fi
+    make $HOME/.config/modprobed.db localmodconfig
+  fi
 }
 
 build() {
