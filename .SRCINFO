@@ -5,6 +5,7 @@ pkgbase = linux-rt-lts
 	url = https://wiki.linuxfoundation.org/realtime/start
 	arch = x86_64
 	license = GPL2
+	makedepends = wget
 	makedepends = bc
 	makedepends = git
 	makedepends = graphviz
@@ -15,18 +16,15 @@ pkgbase = linux-rt-lts
 	makedepends = python-sphinx
 	makedepends = python-sphinx_rtd_theme
 	makedepends = xmlto
+	makedepends = clang
+	makedepends = llvm
 	makedepends = modprobed-db
-	makedepends = wget
 	options = !strip
 	source = https://gitlab.archlinux.org/dvzrv/linux-rt-lts/-/archive/v5.10.27.36.arch1/linux-rt-lts-v5.10.27.36.arch1.tar.gz
 	source = config
 	validpgpkeys = 647F28654894E3BD457199BE38DBBDC86092693E
 	validpgpkeys = 5ED9A48FC54C0A22D1D0804CEBC26CDB5A56DE73
 	validpgpkeys = C7E7849466FE2358343588377258734B41C31549
-	sha512sums = SKIP
-	sha512sums = SKIP
-	b2sums = SKIP
-	b2sums = SKIP
 
 pkgname = linux-rt-lts
 	pkgdesc = The Linux RT LTS kernel and modules
@@ -43,4 +41,3 @@ pkgname = linux-rt-lts-headers
 
 pkgname = linux-rt-lts-docs
 	pkgdesc = Documentation for the Linux RT LTS kernel
-
