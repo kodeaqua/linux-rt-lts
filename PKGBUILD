@@ -18,9 +18,9 @@ source=(
 )
 
 validpgpkeys=(
-  '647F28654894E3BD457199BE38DBBDC86092693E'  # Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-  '5ED9A48FC54C0A22D1D0804CEBC26CDB5A56DE73'  # Steven Rostedt (Der Hacker) <rostedt@goodmis.org>
-  'C7E7849466FE2358343588377258734B41C31549'  # David Runge <dvzrv@archlinux.org>
+  '647F28654894E3BD457199BE38DBBDC86092693E' # Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+  '5ED9A48FC54C0A22D1D0804CEBC26CDB5A56DE73' # Steven Rostedt (Der Hacker) <rostedt@goodmis.org>
+  'C7E7849466FE2358343588377258734B41C31549' # David Runge <dvzrv@archlinux.org>
 )
 
 # Build vars
@@ -32,12 +32,13 @@ makeargs="-j$(nproc --all) CC=clang HOSTCC=clang"
 # Custom vars
 _htmldocs=n
 _localmodcfg=y
+_tracers=n
+_numa=n
 
 # Prepare Function
-prepare()
-{
+prepare() {
   # Renaming dir since new method
-  mv ""$pkgbase"-v"$pkgver"" "$pkgbase" 
+  mv ""$pkgbase"-v"$pkgver"" "$pkgbase"
 
   # Enter kernel dir
   cd "${pkgbase}"
@@ -45,8 +46,8 @@ prepare()
   # Setting up kernel version
   echo "Setting version..."
   scripts/setlocalversion --save-scmversion
-  echo "-$pkgrel" > localversion.10-pkgrel
-  echo "${pkgbase#linux}" > localversion.20-pkgname
+  echo "-$pkgrel" >localversion.10-pkgrel
+  echo "${pkgbase#linux}" >localversion.20-pkgname
 
   # Applying RT patches
   local src
@@ -56,8 +57,21 @@ prepare()
     src="${src//patch.xz/patch}"
     [[ $src = *.patch ]] || continue
     echo "Applying patch $src..."
-    patch -Np1 < "../$src"
+    patch -Np1 <"../$src"
   done
+
+  # Disabling TRACERS to limits debugging and analyzing
+  if [[ "$_tracers" == 'n' ]]; then
+    echo "Disabling FUNCTION_TRACER/GRAPH_TRACER..."
+    scripts/config --disable CONFIG_FUNCTION_TRACER \
+                   --disable CONFIG_STACK_TRACER
+  fi
+
+  # Disable NUMA
+  if [[ "$_numa" == 'n' ]]; then
+    echo "Disabling NUMA..."
+    scripts/config --disable CONFIG_NUMA
+  fi
 
   # Generating config
   echo "Setting config..."
@@ -75,13 +89,12 @@ prepare()
   fi
 
   # Done
-  make -s kernelrelease > version
+  make -s kernelrelease >version
   echo "Prepared $pkgbase version $(<version)"
 }
 
 # Build function
-build()
-{
+build() {
   # Enter kernel dir
   cd "${pkgbase}"
 
@@ -94,13 +107,12 @@ build()
   fi
 }
 
-_package()
-{
+_package() {
   # Show package informations
   pkgdesc="The $pkgdesc kernel and modules"
   depends=(coreutils initramfs kmod)
   optdepends=('crda: to set the correct wireless channels of your country'
-              'linux-firmware: firmware images needed for some devices')
+    'linux-firmware: firmware images needed for some devices')
   provides=(VIRTUALBOX-GUEST-MODULES WIREGUARD-MODULE)
 
   # Entering kernel dir
@@ -128,8 +140,7 @@ _package()
   rm "$modulesdir"/{source,build}
 }
 
-_package-headers()
-{
+_package-headers() {
   # Showing package informations
   pkgdesc="Headers and scripts for building modules for the $pkgdesc kernel"
 
@@ -196,14 +207,14 @@ _package-headers()
   local file
   while read -rd '' file; do
     case "$(file -bi "$file")" in
-      application/x-sharedlib\;*)           # Libraries (.so)
-        strip -v $STRIP_SHARED "$file" ;;
-      application/x-archive\;*)             # Libraries (.a)
-        strip -v $STRIP_STATIC "$file" ;;
-      application/x-executable\;*)          # Binaries
-        strip -v $STRIP_BINARIES "$file" ;;
-      application/x-pie-executable\;*)      # Relocatable binaries
-        strip -v $STRIP_SHARED "$file" ;;
+    application/x-sharedlib\;*) # Libraries (.so)
+      strip -v $STRIP_SHARED "$file" ;;
+    application/x-archive\;*) # Libraries (.a)
+      strip -v $STRIP_STATIC "$file" ;;
+    application/x-executable\;*) # Binaries
+      strip -v $STRIP_BINARIES "$file" ;;
+    application/x-pie-executable\;*) # Relocatable binaries
+      strip -v $STRIP_SHARED "$file" ;;
     esac
   done < <(find "$builddir" -type f -perm -u+x ! -name vmlinux -print0)
 
@@ -217,8 +228,7 @@ _package-headers()
   ln -sr "$builddir" "$pkgdir/usr/src/$pkgbase"
 }
 
-_package-docs()
-{
+_package-docs() {
   # Showing package informations
   pkgdesc="Documentation for the $pkgdesc kernel"
 
